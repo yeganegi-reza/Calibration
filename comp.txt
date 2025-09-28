@@ -1,0 +1,50 @@
+import os
+
+from pathlib import Path
+from config import ConfigManager, ParamManager
+
+from dataclasses import dataclass
+from ensure import ensure_annotations
+
+from reytools.logger import logging
+
+
+@dataclass(frozen=True)
+class {comp_name}Config:
+    a: int
+
+@dataclass(frozen=True)
+class {comp_name}Params:
+    b: int
+
+class {comp_name}ConfManager(ConfigManager):
+    def __init__(self):
+        cur_dir = Path(os.path.dirname(os.path.abspath(__file__)))
+        super().__init__(cur_dir)
+
+    def get_configuration(self) -> {comp_name}Config:
+        config = self.config
+
+        box_config = {comp_name}Config()
+
+        logging.info("{comp_name} configuration loaded")
+        return box_config
+
+
+class {comp_name}ParamManager(ParamManager):
+    def __init__(self):
+        cur_dir = Path(os.path.dirname(os.path.abspath(__file__)))
+        super().__init__(cur_dir)
+
+    def get_params(self) -> {comp_name}Params:
+        parmas = self.params
+        model_def_params = {comp_name}Params()
+        
+        logging.info("{comp_name} params loaded")
+        return model_def_params
+
+
+class {comp_name}:
+    def __init__(self):
+        self.config = {comp_name}ConfManager().get_configuration()
+        self.params = {comp_name}ParamManager().get_params()

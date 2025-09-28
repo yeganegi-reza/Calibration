@@ -1,0 +1,6 @@
+[submodule "src/reytools"]
+	path = src/reytools
+	url = https://github.com/yeganegi-reza/reytools.git
+[submodule "src/reylearn"]
+	path = src/reylearn
+	url = https://github.com/yeganegi-reza/reylearn.git
