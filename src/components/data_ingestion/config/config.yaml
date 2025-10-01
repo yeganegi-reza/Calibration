@@ -1,0 +1,13 @@
+artifact_root: artifacts
+data_root_dir: artifacts/data_ingestion
+
+movielens_url: "https://recbole.s3-accelerate.amazonaws.com/ProcessedDatasets/MovieLens/ml-1m.zip"
+movielens_local_dir: "artifacts/data_ingestion/ml_1m"
+movielens_zip_file: "artifacts/data_ingestion/ml_1m.zip"
+
+lfm_url: ""
+lfm_local_dir: "artifacts/data_ingestion/lfm_2b"
+lfm_zip_file: "artifacts/data_ingestion/lfm_2b.zip"
+
+movielens_name: "ml_1m"
+lfm_data_name: "lfm_2b"

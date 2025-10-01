@@ -60,7 +60,7 @@ def check_comp_name(comp_name: str):
 
 
 cur_dir = os.path.dirname(os.path.abspath(__file__))
-comp_name = "model trainig"
+comp_name = "data ingestion"
 
 file_name, class_name = check_comp_name(comp_name=comp_name)
 comp_dir = Path(os.path.join(cur_dir, "src", "components", file_name))

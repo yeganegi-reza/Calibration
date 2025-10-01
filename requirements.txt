@@ -1,0 +1,12 @@
+numpy 
+pandas
+pyarrow
+fastparquet
+seaborn 
+scipy
+pytest
+pyYAML
+recbole
+-e .
+-e src/reytools
+-e src/reylearn
