@@ -14,6 +14,16 @@ test_dataframe = pd.DataFrame(
     }
 )
 
+duplicate_dataframe = pd.DataFrame(
+    {
+        "user": [1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5],
+        "item": [101, 103, 102, 103, 104, 101, 105, 102, 104, 106, 106, 101, 103, 105, 106],
+        "rating": [4, 1, 5, 3, 1, 5, 3, 4, 1, 4, 2, 2, 3, 2, 3],
+        "time": [166, 169, 171, 173, 175, 176, 176, 176, 177, 182, 194, 196, 196, 196, 199],
+    }
+)
+
+
 user_map_result = {
     np.int64(1): np.int64(0),
     np.int64(2): np.int64(1),
@@ -40,8 +50,12 @@ def test_generate_user_item_matrix():
     assert pytest.approx(sparse_matrix.toarray()) == result_matrix
 
 
-def test_create_user_item_map():
+def test_generate_user_item_matrix_check_dupicate():
+    with pytest.raises(ValueError):
+        generate_user_item_matrix(duplicate_dataframe, user_map_result, item_map_result)
 
+
+def test_create_user_item_map():
     user_map, item_map = create_user_item_map(test_dataframe)
     assert pytest.approx(user_map_result) == user_map
     assert pytest.approx(item_map) == item_map_result

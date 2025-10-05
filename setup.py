@@ -5,8 +5,8 @@ with open("README.md", "r", encoding="utf-8") as f:
 
 __version__ = "0.0.0"
 
-REPO_NAME = "Debiasing"
-SRC_REPO = "Debiasing"
+REPO_NAME = "Calibration"
+SRC_REPO = "Calibration"
 
 AUTHOR_USER_NAME = "yeganegi-reza"
 AUTHOR_EMAIL = "yeganegi.reza@gmail.com"
@@ -16,7 +16,7 @@ setuptools.setup(
     version=__version__,
     author=AUTHOR_USER_NAME,
     author_email=AUTHOR_EMAIL,
-    description="A project for investigation of debiasing and related ",
+    description="A project for investigation of Calibration and related ",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url=f"https://github.com/{AUTHOR_USER_NAME}/{REPO_NAME}",

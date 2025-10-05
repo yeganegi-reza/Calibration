@@ -1,21 +1,34 @@
 import numpy as np
 from ensure import ensure_annotations
 
+from typing import Union
+from scipy.sparse import csr_matrix
+
+Matrix = Union[np.ndarray, csr_matrix]
+
 
 @ensure_annotations
-def group_items_based_popularity(user_item: np.ndarray, proportions: list):
-    assert np.isclose(sum(proportions), 1.0)
-    n_items = user_item.shape[1]
-
+def calc_item_popularity(user_item: Matrix, binary: bool = True) -> np.ndarray:
     # for the cases that user item is not 0 and 1
-    user_item = user_item > 0
+    if binary:
+        user_item = user_item > 0
+    if isinstance(user_item, np.ndarray):
+        item_popularity = user_item.sum(axis=0, keepdims=False)
+    else:
+        item_popularity = user_item.sum(axis=0)
+        item_popularity = np.array(item_popularity).flatten()
+    return item_popularity
 
-    item_popularity = user_item.sum(axis=0, keepdims=False) 
-    total_popularity = item_popularity.sum()
+
+@ensure_annotations
+def group_items_based_popularity(item_popularity: np.ndarray, proportions: list):
+    assert np.isclose(sum(proportions), 1.0)
+    n_items = len(item_popularity)
 
     arg_sort = item_popularity.argsort()[::-1]
     sorted_popularity = item_popularity[arg_sort]
 
+    total_popularity = item_popularity.sum()
     cumulative_proportions = np.cumsum(proportions)
     popularity_boundaries = cumulative_proportions * total_popularity
 
@@ -34,35 +47,27 @@ def group_items_based_popularity(user_item: np.ndarray, proportions: list):
     return item_group
 
 
-def calculate_pc_qc(user_item: np.ndarray, rec_matrix: np.ndarray, item_groups: np.ndarray):
-    if user_item.shape[1] != rec_matrix.shape[1]:
-        raise ValueError("The number of items should be the same in user_item and rec_matrix")
-
+def calculate_pc(user_item: np.ndarray, item_groups: np.ndarray, epsilon: float = 1e-10):
     if user_item.shape[1] != item_groups.shape[0]:
         raise ValueError("the length of item_groups should be same the number of items ")
 
     unique_groups = np.unique(item_groups)
     n_groups = len(unique_groups)
     num_orig_users, _ = user_item.shape
-    num_rec_users, _ = rec_matrix.shape
 
     p_c_given_u = np.zeros((num_orig_users, n_groups))
-    q_c_given_u = np.zeros((num_rec_users, n_groups))
+    total_user_profile_actions = user_item.sum(axis=1).astype(float)
 
-    user_profile_weight = user_item.sum(axis=1)
-    user_rec_weight = rec_matrix.sum(axis=1)
+    # for handling divition by zero
+    zero_mask = total_user_profile_actions < epsilon
+    total_user_profile_actions[zero_mask] = epsilon
+
     for group_idx, group_id in enumerate(unique_groups):
         group_mask = item_groups == group_id
         true_popularity_per_user = user_item[:, group_mask]
-        pred_popularity_per_user = rec_matrix[:, group_mask]
 
         p_c_numerator = true_popularity_per_user.sum(axis=1)
-        p_c_group = p_c_numerator / user_profile_weight
-
-        q_c_numerator = pred_popularity_per_user.sum(axis=1)
-        q_c_group = q_c_numerator / user_rec_weight
-
+        p_c_group = p_c_numerator / total_user_profile_actions
         p_c_given_u[:, group_idx] = p_c_group
-        q_c_given_u[:, group_idx] = q_c_group
 
-    return p_c_given_u, q_c_given_u
+    return p_c_given_u

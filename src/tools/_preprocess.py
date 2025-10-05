@@ -3,6 +3,7 @@ import numpy as np
 from scipy.sparse import csr_matrix
 from reytools.logger import logging
 
+
 def generate_user_item_matrix(
     dataset: pd.DataFrame, user_id_map: dict, item_id_map: dict
 ) -> tuple[csr_matrix, dict, dict]:
@@ -16,6 +17,10 @@ def generate_user_item_matrix(
     Returns:
         tuple: (The sparse matrix, user_id_map, item_id_map).
     """
+    has_duplicates = dataset.duplicated(subset=["user", "item"]).any()
+    if has_duplicates:
+        raise ValueError("The combination of user, item should be unique")
+
     # Apply the mappings to create new indexed columns for matrix construction.
     number_user = len(user_id_map)
     number_item = len(item_id_map)
@@ -64,13 +69,17 @@ def k_core_filtering(inter_data: pd.DataFrame, k_item: int, k_user: int) -> pd.D
         item_above = set(item_counts[item_counts >= k_item].index)
         inter_data = inter_data[inter_data.item.isin(item_above)]
         print("Records after item pass: ", len(inter_data))
-        logging.info(f"""Remaining items: {inter_data.item.nunique()}, Remaining users: {inter_data.item.nunique()} """)
+        logging.info(
+            f"""Remaining items: {inter_data.item.nunique()}, Remaining users: {inter_data.item.nunique()} """
+        )
 
         # User pass
         user_counts = dataset.user.value_counts()
         user_above = set(user_counts[user_counts >= k_user].index)
         dataset = dataset[dataset.user.isin(user_above)]
-        logging.info(f"""Remaining items: {inter_data.item.nunique()}, Remaining users: {inter_data.item.nunique()} """)
+        logging.info(
+            f"""Remaining items: {inter_data.item.nunique()}, Remaining users: {inter_data.item.nunique()} """
+        )
 
         if len(dataset) == start_size:
             print("Exiting...")
