@@ -61,13 +61,12 @@ def calculate_pc(user_item: np.ndarray, item_groups: np.ndarray, epsilon: float 
     # for handling divition by zero
     zero_mask = total_user_profile_actions < epsilon
     total_user_profile_actions[zero_mask] = epsilon
-
     for group_idx, group_id in enumerate(unique_groups):
-        group_mask = item_groups == group_id
-        true_popularity_per_user = user_item[:, group_mask]
-
-        p_c_numerator = true_popularity_per_user.sum(axis=1)
-        p_c_group = p_c_numerator / total_user_profile_actions
-        p_c_given_u[:, group_idx] = p_c_group
+            group_mask = item_groups == group_id
+            for user_index in range(num_orig_users): 
+                true_popularity_per_user = user_item[user_index, group_mask]
+                p_c_numerator = true_popularity_per_user.sum()
+                p_c_group = p_c_numerator / total_user_profile_actions[user_index]
+                p_c_given_u[user_index, group_idx] = p_c_group
 
     return p_c_given_u
